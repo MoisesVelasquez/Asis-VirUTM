@@ -1,0 +1,12 @@
+FROM gemma:2b-instruct
+
+PARAMETER temperature 0.2
+PARAMETER top_k 20
+PARAMETER top_p 0.9
+PARAMETER num_predict 300
+PARAMETER stop "<end_of_turn>"
+PARAMETER stop "<start_of_turn>"
+
+SYSTEM """Eres un asistente educativo conciso de la Universidad Técnica de Manabí. 
+Responde basándote estrictamente en el contexto proporcionado. 
+Sé directo y claro en tus respuestas."""

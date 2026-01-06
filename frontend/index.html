@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asistente Educativo UTM</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .chat-container {
+            background: white;
+            width: 100%;
+            max-width: 800px;
+            height: 90vh;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .chat-header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 25px;
+            text-align: center;
+            border-bottom: 3px solid #f39c12;
+        }
+
+        .chat-header h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .chat-header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background: #f8f9fa;
+            scroll-behavior: smooth;
+        }
+
+        .message {
+            display: flex;
+            margin-bottom: 20px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message.user {
+            justify-content: flex-end;
+        }
+
+        .message-content {
+            max-width: 70%;
+            padding: 15px 20px;
+            border-radius: 18px;
+            line-height: 1.5;
+            word-wrap: break-word;
+        }
+
+        .message.user .message-content {
+            background: linear-gradient(135deg, #2a5298 0%, #1e3c72 100%);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .message.assistant .message-content {
+            background: white;
+            color: #333;
+            border: 1px solid #e0e0e0;
+            border-bottom-left-radius: 4px;
+        }
+
+        .loading-indicator {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            background: white;
+            border-radius: 18px;
+            border: 1px solid #e0e0e0;
+            max-width: 200px;
+        }
+
+        .loading-indicator .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #2a5298;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .chat-input-container {
+            padding: 20px;
+            background: white;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .chat-input-wrapper {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        #userInput {
+            flex: 1;
+            padding: 15px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 25px;
+            font-size: 15px;
+            outline: none;
+            transition: border-color 0.3s;
+            resize: none;
+            font-family: inherit;
+            min-height: 50px;
+            max-height: 120px;
+        }
+
+        #userInput:focus {
+            border-color: #2a5298;
+        }
+
+        #sendButton {
+            background: linear-gradient(135deg, #2a5298 0%, #1e3c72 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            min-width: 100px;
+        }
+
+        #sendButton:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(42, 82, 152, 0.3);
+        }
+
+        #sendButton:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .error-message {
+            background: #ffebee;
+            color: #c62828;
+            padding: 15px 20px;
+            border-radius: 18px;
+            border: 1px solid #ef5350;
+            max-width: 70%;
+        }
+
+        .metadata {
+            font-size: 12px;
+            color: #666;
+            margin-top: 8px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .metadata span {
+            background: #f0f0f0;
+            padding: 3px 10px;
+            border-radius: 10px;
+        }
+
+        .chat-messages::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .chat-messages::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: #2a5298;
+            border-radius: 4px;
+        }
+
+        .welcome-message {
+            text-align: center;
+            padding: 40px 20px;
+            color: #666;
+        }
+
+        .welcome-message h2 {
+            color: #2a5298;
+            margin-bottom: 15px;
+        }
+
+        .welcome-message p {
+            margin-bottom: 10px;
+            line-height: 1.6;
+        }
+
+        .suggestions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .suggestion-chip {
+            background: white;
+            border: 2px solid #2a5298;
+            color: #2a5298;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.3s;
+        }
+
+        .suggestion-chip:hover {
+            background: #2a5298;
+            color: white;
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            <h1>🎓 Asistente Educativo UTM</h1>
+            <p>Estrategia, Gestión y Adquisición en Sistemas de Información (ISI17)</p>
+        </div>
+
+        <div class="chat-messages" id="chatMessages">
+            <div class="welcome-message">
+                <h2>¡Bienvenido!</h2>
+                <p>Soy tu asistente educativo para la asignatura ISI17.</p>
+                <p>Puedo ayudarte con información sobre el syllabus, contenidos, evaluaciones y más.</p>
+                <div class="suggestions">
+                    <div class="suggestion-chip" onclick="sendSuggestion('¿Cuál es el objetivo de la asignatura?')">
+                        📚 Objetivo de la asignatura
+                    </div>
+                    <div class="suggestion-chip" onclick="sendSuggestion('¿Cuáles son las unidades?')">
+                        📋 Unidades del curso
+                    </div>
+                    <div class="suggestion-chip" onclick="sendSuggestion('¿Cómo se evalúa la asignatura?')">
+                        ✅ Criterios de evaluación
+                    </div>
+                    <div class="suggestion-chip" onclick="sendSuggestion('¿Qué bibliografía se utiliza?')">
+                        📖 Bibliografía
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="chat-input-container">
+            <div class="chat-input-wrapper">
+                <textarea 
+                    id="userInput" 
+                    placeholder="Escribe tu pregunta aquí..."
+                    rows="1"
+                ></textarea>
+                <button id="sendButton" onclick="sendMessage()">Enviar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://127.0.0.1:8000/chat';
+        const chatMessages = document.getElementById('chatMessages');
+        const userInput = document.getElementById('userInput');
+        const sendButton = document.getElementById('sendButton');
+
+        userInput.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+        });
+
+        userInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+
+        function sendSuggestion(text) {
+            userInput.value = text;
+            sendMessage();
+        }
+
+        async function sendMessage() {
+            const query = userInput.value.trim();
+            
+            if (!query) {
+                return;
+            }
+
+            const welcomeMsg = document.querySelector('.welcome-message');
+            if (welcomeMsg) {
+                welcomeMsg.remove();
+            }
+
+            addMessage(query, 'user');
+            
+            userInput.value = '';
+            userInput.style.height = 'auto';
+            
+            userInput.disabled = true;
+            sendButton.disabled = true;
+            
+            const loadingId = addLoadingIndicator();
+            
+            try {
+                const startTime = performance.now();
+                
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ user_query: query })
+                });
+
+                const endTime = performance.now();
+                const responseTime = ((endTime - startTime) / 1000).toFixed(2);
+
+                removeLoadingIndicator(loadingId);
+
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({ detail: 'Error desconocido' }));
+                    addErrorMessage(`Error ${response.status}: ${errorData.detail || 'No se pudo conectar con el servidor'}`);
+                    return;
+                }
+
+                const data = await response.json();
+                
+                addMessage(data.response, 'assistant', {
+                    cached: data.cached,
+                    docs_found: data.docs_found,
+                    time: responseTime
+                });
+
+            } catch (error) {
+                removeLoadingIndicator(loadingId);
+                addErrorMessage(`Error de conexión: ${error.message}. Asegúrate de que la API esté corriendo en http://127.0.0.1:8000`);
+            } finally {
+                userInput.disabled = false;
+                sendButton.disabled = false;
+                userInput.focus();
+            }
+        }
+
+        function addMessage(text, sender, metadata = null) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}`;
+            
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'message-content';
+            contentDiv.textContent = text;
+            
+            if (metadata) {
+                const metaDiv = document.createElement('div');
+                metaDiv.className = 'metadata';
+                
+                if (metadata.cached) {
+                    metaDiv.innerHTML += '<span>⚡ Caché</span>';
+                }
+                if (metadata.docs_found !== undefined) {
+                    metaDiv.innerHTML += `<span>📄 ${metadata.docs_found} docs</span>`;
+                }
+                if (metadata.time) {
+                    metaDiv.innerHTML += `<span>⏱️ ${metadata.time}s</span>`;
+                }
+                
+                contentDiv.appendChild(metaDiv);
+            }
+            
+            messageDiv.appendChild(contentDiv);
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function addLoadingIndicator() {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message assistant';
+            messageDiv.id = 'loading-' + Date.now();
+            
+            const loadingDiv = document.createElement('div');
+            loadingDiv.className = 'loading-indicator';
+            loadingDiv.innerHTML = '<div class="spinner"></div><span>Pensando...</span>';
+            
+            messageDiv.appendChild(loadingDiv);
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            
+            return messageDiv.id;
+        }
+
+        function removeLoadingIndicator(id) {
+            const loadingElement = document.getElementById(id);
+            if (loadingElement) {
+                loadingElement.remove();
+            }
+        }
+
+        function addErrorMessage(text) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message assistant';
+            
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error-message';
+            errorDiv.textContent = text;
+            
+            messageDiv.appendChild(errorDiv);
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        window.addEventListener('load', () => {
+            userInput.focus();
+        });
+    </script>
+</body>
+</html>

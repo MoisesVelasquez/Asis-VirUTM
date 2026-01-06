@@ -1,0 +1,31 @@
+=== RESULTADOS DE PRUEBAS - ASISTENTE EDUCATIVO UTM ===
+Fecha: 2025-11-11 21:30:09
+
+PRUEBA RF2: PRECISIÓN
+Pregunta,Esperado,Obtenido,Correcto,Latencia,Cached
+¿Cuántos créditos tiene la asignatura?,3,La asignatura tiene 3 créditos.,SÍ,10.42s,NO
+¿Quién es la docente?,Lucia,La docente es **Lucia Bernarda**.,SÍ,3.75s,NO
+¿Cuántas unidades tiene el curso?,3,El curso tiene **8 unidades**.,NO,8.69s,NO
+¿Qué nivel es la asignatura?,noveno,"La asignatura es de nivel novino ""A"", ""B"" paralelo.",NO,11.25s,NO
+¿Cuál es el código de la asignatura?,ISI17,"La información proporcionada no incluye el código de la asignatura, por lo que no puedo proporcionar una respuesta a la pregunta.",NO,8.94s,NO
+
+RESUMEN RF2
+Correctas,2
+Total,5
+Porcentaje,40.0%
+
+PRUEBA RNF2: LATENCIA
+Pregunta,Latencia (s),Cumple <3s,Cached
+¿Cuál es el objetivo de la asignatura?,5.06,NO,NO
+¿Cómo se evalúa la asignatura?,13.33,NO,NO
+¿Qué bibliografía se utiliza?,6.66,NO,NO
+¿Cuáles son las unidades del curso?,10.92,NO,NO
+¿Qué es la toma de decisiones según el syllabus?,10.86,NO,NO
+¿Qué estrategias de SI se mencionan?,10.58,NO,NO
+¿Cómo se gestiona la adquisición de SI?,14.51,NO,NO
+
+RESUMEN RNF2
+Latencia promedio,10.27s
+Respuestas < 3s,0
+Total,7
+Porcentaje,0.0%
