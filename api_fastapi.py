@@ -21,7 +21,9 @@ llm = ChatGroq(
     temperature=0.3,
     max_tokens=250
 )
-
+# En api_fastapi.py
+persist_directory = "chroma_db" 
+# ... código para cargar el vectorstore desde esa carpeta
 # 2. CONFIGURACIÓN DE BASE DE DATOS (CHROMA)
 embeddings_model = HuggingFaceEmbeddings(
     model_name="all-MiniLM-L6-v2",
