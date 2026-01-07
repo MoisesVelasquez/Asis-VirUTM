@@ -70,10 +70,23 @@ def buscar_contexto(query: str):
 # RUTA PARA MOSTRAR EL HTML (EL INDEX)
 @app.get("/")
 async def read_index():
+    # Intento 1: Ruta absoluta
     path = os.path.join(current_dir, "index.html")
     if os.path.exists(path):
         return FileResponse(path)
-    return {"error": f"No se encontró index.html en la raíz. Ruta buscada: {path}"}
+    
+    # Intento 2: Búsqueda en el directorio de trabajo actual
+    path_alt = os.path.join(os.getcwd(), "index.html")
+    if os.path.exists(path_alt):
+        return FileResponse(path_alt)
+        
+    # Si falla, dinos qué archivos ve el servidor realmente
+    files_in_dir = os.listdir(current_dir)
+    return {
+        "error": "No se encontró index.html",
+        "ruta_buscada": path,
+        "archivos_que_existen_en_raiz": files_in_dir
+    }
 
 # RUTA PARA PROCESAR PREGUNTAS
 @app.post("/preguntar")
