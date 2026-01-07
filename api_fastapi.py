@@ -8,6 +8,10 @@ from dotenv import load_dotenv
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_chroma import Chroma
 from langchain_groq import ChatGroq
+from fastapi import FastAPI
+from fastapi.responses import FileResponse # Añade esta línea
+from fastapi.staticfiles import StaticFiles
+import os
 
 # 1. CONFIGURACIÓN DE IA (GROQ - ONLINE)
 # 1. CONFIGURACIÓN DE IA (GROQ - ONLINE)
@@ -191,3 +195,8 @@ async def debug_search(request: ChatRequest):
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
+    
+    @app.get("/")
+async def read_index():
+    # Esto busca el archivo index.html en la carpeta principal
+    return FileResponse('index.html')
